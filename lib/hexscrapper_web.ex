@@ -21,12 +21,12 @@ defmodule HexscrapperWeb do
 
   def router do
     quote do
-      use Phoenix.Router, helpers: false
-
-      # Import common connection and controller functions to use in pipelines
+      use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
       import Phoenix.LiveView.Router
+
+      alias HexscrapperWeb.Router.Helpers, as: Routes
     end
   end
 
@@ -100,7 +100,8 @@ defmodule HexscrapperWeb do
       use Phoenix.VerifiedRoutes,
         endpoint: HexscrapperWeb.Endpoint,
         router: HexscrapperWeb.Router,
-        statics: HexscrapperWeb.static_paths()
+        statics: HexscrapperWeb.static_paths(),
+        helpers: HexscrapperWeb.Router.Helpers
     end
   end
 

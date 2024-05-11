@@ -16,7 +16,7 @@ config :hexscrapper, HexscrapperWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [html: HexscrapperWeb.ErrorHTML, json: HexscrapperWeb.ErrorJSON],
+    formats: [json: HexscrapperWeb.ErrorJSON],
     layout: false
   ],
   pubsub_server: Hexscrapper.PubSub,
