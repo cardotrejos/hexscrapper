@@ -15,7 +15,7 @@ defmodule HexscrapperWeb.UserController do
     end
   end
 
-  def login(conn, %{"email" => email, "password" => password}) do
+  def login(conn, %{"user" => %{"email" => email, "password" => password}}) do
     case Accounts.authenticate_user(email, password) do
       {:ok, user} ->
         conn
