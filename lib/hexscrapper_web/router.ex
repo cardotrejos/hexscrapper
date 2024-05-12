@@ -10,5 +10,8 @@ defmodule HexscrapperWeb.Router do
 
     post "/register", UserController, :register
     post "/login", UserController, :login
+    post "/pages", PageController, :create
+    get "/pages", PageController, :index
+    get "/pages/:id", PageController, :show
   end
 end
