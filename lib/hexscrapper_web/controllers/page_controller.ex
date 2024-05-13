@@ -1,47 +1,44 @@
 defmodule HexscrapperWeb.PageController do
   use HexscrapperWeb, :controller
-  alias Hexscrapper.{Scraper, Pages, Links}
-  alias Hexscrapper.Repo
+  alias Hexscrapper.{Scraper, Pages}
 
   def create(conn, %{"url" => url}) do
-    case Scraper.scrape_page(url) do
-      {:ok, %{title: title, links: links}} ->
-        case Pages.create_page(%{url: url, title: title}) do
-          {:ok, page} ->
-            timestamps =
-                NaiveDateTime.utc_now()
-                |> NaiveDateTime.truncate(:second)
-                |> DateTime.from_naive!("Etc/UTC")
-            link_attrs =
-              Enum.map(links, fn link ->
-                %{
-                  href: link.href,
-                  name: link.name,
-                  page_id: page.id,
-                  inserted_at: timestamps,
-                  updated_at: timestamps
-                }
-              end)
+    case URI.parse(url) do
+      %URI{scheme: "http" <> _} ->
+        case Scraper.scrape_page(url) do
+          {:ok, %{title: title, links: links}} ->
+            case Pages.create_page(%{url: url, title: title}) do
+              {:ok, page} ->
+                case Pages.create_links(page, links) do
+                  {_inserted_count, _} ->
+                    page = Pages.get_page_with_links!(page.id)
 
-            case Repo.insert_all(Links.Link, link_attrs, on_conflict: :nothing) do
-                {_inserted_count, _} ->
-                page = Pages.get_page_with_links!(page.id)
+                    conn
+                    |> put_status(:created)
+                    |> json(%{page: page, links: page.links})
 
+                  _ ->
+                    conn
+                    |> put_status(:internal_server_error)
+                    |> json(%{error: "Failed to create links"})
+                end
+
+              {:error, changeset} ->
                 conn
-                |> put_status(:created)
-                |> json(%{page: page, links: page.links})
+                |> put_status(:unprocessable_entity)
+                |> json(%{errors: changeset_errors(changeset)})
             end
 
-          {:error, changeset} ->
+          {:error, reason} ->
             conn
             |> put_status(:unprocessable_entity)
-            |> json(%{errors: changeset_errors(changeset)})
+            |> json(%{error: reason})
         end
 
-      {:error, reason} ->
+      _ ->
         conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{error: reason})
+        |> put_status(:bad_request)
+        |> json(%{error: "Invalid URL"})
     end
   end
 

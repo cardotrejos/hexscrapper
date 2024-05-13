@@ -4,7 +4,7 @@ defmodule HexscrapperWeb.PageLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, url: "", page: 1, pages: [], error: nil)}
+    {:ok, assign(socket, url: "", page: 1, pages: [], error: nil, loading: false)}
   end
 
   @impl true
@@ -23,22 +23,21 @@ defmodule HexscrapperWeb.PageLive.Index do
 
   @impl true
   def handle_event("scrape", %{"url" => url}, socket) do
+    socket = assign(socket, loading: true, error: nil)
+    {:noreply, socket}
+
     case Scraper.scrape_page(url) do
       {:ok, %{title: title, links: links}} ->
         {:ok, page} = Pages.create_page(%{url: url, title: title})
         Pages.create_links(page, links)
-        {:noreply, assign(socket, url: "", error: nil)}
+        {:noreply, assign(socket, url: "", loading: false)}
 
       {:error, reason} ->
-        {:noreply, assign(socket, error: reason)}
+        {:noreply, assign(socket, loading: false, error: reason)}
     end
   end
 
   def handle_event("change_url", %{"url" => url}, socket) do
     {:noreply, assign(socket, url: url)}
   end
-
-
-  defp page_title(:show), do: "Show Page"
-  defp page_title(:index), do: "Listing Pages"
 end

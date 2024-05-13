@@ -11,7 +11,7 @@ defmodule Hexscrapper.Scraper do
     end
   end
 
-  defp parse_links(body) do
+    defp parse_links(body) do
     case Floki.parse_document(body) do
       {:ok, document} ->
         title = document |> Floki.find("title") |> Floki.text()
@@ -20,13 +20,14 @@ defmodule Hexscrapper.Scraper do
           Floki.find(document, "a")
           |> Enum.map(fn link ->
             href = Floki.attribute(link, "href") |> List.first()
-            name = Floki.text(link)
+            name = Floki.text(link) |> String.trim()
             %{href: href, name: name}
           end)
 
         {:ok, %{title: title, links: links}}
 
       {:error, reason} ->
+        Logger.error("Error parsing page: #{inspect(reason)}")
         {:error, reason}
     end
   end

@@ -2,18 +2,10 @@ defmodule Hexscrapper.Pages do
   @moduledoc """
   The Pages context.
   """
-
   import Ecto.Query, warn: false
   alias Hexscrapper.Repo
   alias Hexscrapper.Pages.Page
   alias Hexscrapper.Links
-
-  # @doc """
-  # Returns the list of pages.
-  # """
-  # def list_pages do
-  #   Repo.all(Page)
-  # end
 
   @doc """
   Gets a single page.
