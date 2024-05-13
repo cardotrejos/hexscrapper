@@ -30,29 +30,6 @@ defmodule Hexscrapper.Pages do
     |> Repo.insert()
   end
 
-  @doc """
-  Updates a page.
-  """
-  def update_page(%Page{} = page, attrs) do
-    page
-    |> Page.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a page.
-  """
-  def delete_page(%Page{} = page) do
-    Repo.delete(page)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking page changes.
-  """
-  def change_page(%Page{} = page, attrs \\ %{}) do
-    Page.changeset(page, attrs)
-  end
-
   def get_page_with_links!(id, params \\ %{}) do
     page = Repo.get!(Page, id)
     links = Links.get_links_by_page_id(page.id, params)

@@ -3,7 +3,6 @@ defmodule Hexscrapper.Links.Link do
   import Ecto.Changeset
 
   @derive {Jason.Encoder, only: [:id, :href, :name, :page_id, :inserted_at, :updated_at]}
-
   schema "links" do
     field :name, :string
     field :href, :string
