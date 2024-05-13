@@ -10,8 +10,12 @@ defmodule Hexscrapper.Pages do
   @doc """
   Returns the list of pages.
   """
-  def list_pages do
-    Repo.all(Page)
+  def list_pages(params \\ %{}) do
+    page = params["page"] || 1
+    page_size = params["page_size"] || 10
+
+    Page
+    |> Repo.paginate(page: page, page_size: page_size)
   end
 
   @doc """
@@ -52,9 +56,9 @@ defmodule Hexscrapper.Pages do
     Page.changeset(page, attrs)
   end
 
-  def get_page_with_links(id) do
+  def get_page_with_links!(id) do
     Page
-    |> Repo.get(id)
+    |> Repo.get!(id)
     |> Repo.preload(:links)
   end
 end

@@ -10,8 +10,12 @@ defmodule Hexscrapper.Links do
   @doc """
   Returns the list of links.
   """
-  def list_links do
-    Repo.all(Link)
+  def list_links(params \\ %{}) do
+    page = params["page"] || 1
+    page_size = params["page_size"] || 10
+
+    Link
+    |>Repo.paginate(page: page, page_size: page_size)
   end
 
   @doc """

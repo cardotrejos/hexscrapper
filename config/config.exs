@@ -9,6 +9,7 @@ import Config
 
 config :hexscrapper,
   ecto_repos: [Hexscrapper.Repo],
+  scrivener: [page_size: 10],
   generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint

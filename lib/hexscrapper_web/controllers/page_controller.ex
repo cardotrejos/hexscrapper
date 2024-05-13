@@ -8,15 +8,29 @@ defmodule HexscrapperWeb.PageController do
       {:ok, %{title: title, links: links}} ->
         case Pages.create_page(%{url: url, title: title}) do
           {:ok, page} ->
-            Enum.each(links, fn link ->
-              Links.create_link(%{href: link.href, name: link.name, page_id: page.id})
-            end)
+            timestamps =
+                NaiveDateTime.utc_now()
+                |> NaiveDateTime.truncate(:second)
+                |> DateTime.from_naive!("Etc/UTC")
+            link_attrs =
+              Enum.map(links, fn link ->
+                %{
+                  href: link.href,
+                  name: link.name,
+                  page_id: page.id,
+                  inserted_at: timestamps,
+                  updated_at: timestamps
+                }
+              end)
 
-            page = Repo.preload(page, :links)
+            case Repo.insert_all(Links.Link, link_attrs, on_conflict: :nothing) do
+                {_inserted_count, _} ->
+                page = Pages.get_page_with_links!(page.id)
 
-            conn
-            |> put_status(:created)
-            |> json(%{page: page, links: links})
+                conn
+                |> put_status(:created)
+                |> json(%{page: page, links: page.links})
+            end
 
           {:error, changeset} ->
             conn
@@ -40,7 +54,7 @@ defmodule HexscrapperWeb.PageController do
   end
 
   def show(conn, %{"id" => id}) do
-    page = Pages.get_page_with_links(id)
+    page = Pages.get_page_with_links!(id)
 
     conn
     |> put_view(HexscrapperWeb.PageJSON)
