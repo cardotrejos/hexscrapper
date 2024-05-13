@@ -6,6 +6,7 @@ defmodule Hexscrapper.Pages do
   import Ecto.Query, warn: false
   alias Hexscrapper.Repo
   alias Hexscrapper.Pages.Page
+  alias Hexscrapper.Links
 
   @doc """
   Returns the list of pages.
@@ -52,9 +53,9 @@ defmodule Hexscrapper.Pages do
     Page.changeset(page, attrs)
   end
 
-  def get_page_with_links!(id) do
-    Page
-    |> Repo.get!(id)
-    |> Repo.preload(:links)
+  def get_page_with_links!(id, params \\ %{}) do
+    page = Repo.get!(Page, id)
+    links = Links.get_links_by_page_id(page.id, params)
+    %{page: page, links: links.entries, pagination: links}
   end
 end

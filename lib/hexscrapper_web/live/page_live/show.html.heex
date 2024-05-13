@@ -14,7 +14,7 @@
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
-        <%= for link <- @page.links do %>
+        <%= for link <- @links do %>
           <tr>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
               <%= link.name %>
@@ -28,7 +28,34 @@
         <% end %>
       </tbody>
     </table>
-    
+  </div>
+
+  <div class="mt-4 flex justify-between">
+    <div>
+      <%= if @pagination.page_number > 1 do %>
+        <.link navigate={~p"/pages/#{@page.id}?page=#{@pagination.page_number - 1}"} class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded">
+          Previous
+        </.link>
+      <% end %>
+    </div>
+
+    <div class="flex space-x-2">
+      <%= for page <- 1..@pagination.total_pages do %>
+        <.link navigate={~p"/pages/#{@page.id}?page=#{page}"} class={
+          "py-2 px-4 rounded #{if @pagination.page_number == page, do: "bg-blue-500 text-white", else: "bg-gray-200 hover:bg-gray-300 text-gray-700"}"
+        }>
+          <%= page %>
+        </.link>
+      <% end %>
+    </div>
+
+    <div>
+      <%= if @pagination.page_number < @pagination.total_pages do %>
+        <.link navigate={~p"/pages/#{@page.id}?page=#{@pagination.page_number + 1}"} class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded">
+          Next
+        </.link>
+      <% end %>
+    </div>
   </div>
 
   <div class="mt-8">
